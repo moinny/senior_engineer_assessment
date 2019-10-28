@@ -19,10 +19,13 @@ query or group of queries that return the patient name, and their most recent ri
 Any patients that dont have a risk level should also be included in the results. 
 
 **********************/
-
-
-
-
+--ANSWER TO QUESTION 1 
+select PersonName, Max(RiskDateTime), Max(RiskLevel)
+From	(Select p.PersonName, r.RiskLevel, r.RiskDateTime
+		From Person p
+		Left join Risk r on p.PersonID = r.PersonID
+		) B
+Group By PersonName
 
 /**********************
 
@@ -35,7 +38,11 @@ return the full name and nickname of each person. The nickname should contain on
 or be blank if no nickname exists.
 
 **********************/
-
+--ANSWER TO QUESTION 2
+Select PersonName, 
+Case when CHARINDEX('(',PersonName) > 0 Then Substring(PersonName,Charindex('(',PersonName)+1 ,Charindex(')',PersonName)-Charindex('(',PersonName)-1)
+Else '' End
+From Person
 
 
 /**********************
@@ -46,7 +53,9 @@ Write a query to return risk data for all patients, all payers
 and a moving average of risk for that patient and payer in dbo.Risk. 
 
 **********************/
-
+--ANSWER TO QUESTION 6
+Select PersonID, AttributedPayer, AVG(RiskScore) OVER (PARTITION BY PersonID ORDER BY AttributedPayer ROWS 19 PRECEDING) AS MovingAverage
+From Risk
 
 
 
